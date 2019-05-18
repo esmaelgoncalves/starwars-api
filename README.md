@@ -5,7 +5,7 @@
 * It's a Java Spring Boot application
 * The api uses MY-SQL database for production and embbeded in-memory database H2
 * The database model is auto generated when the application up and run with flyway database migrator
-* For tests purposes there two files in tests/resources: schema.sql and data.sql, to create and populate the database for some unit tests.
+* For tests purposes there two files in tests/resources: schema.sql and data, to create and populate the database for some unit tests.
 
 ### Set Up and Running With Docker ###
 
@@ -32,7 +32,7 @@ or in the root project folder:
 mvn clean install -DskipTests
 ```
 
-* To Compile with test : Run the follow command line
+* To Compile with Unit test : Run the follow command line
 ```
 mvn clean install
 ```
@@ -40,6 +40,11 @@ mvn clean install
 * To run just automated tests: Run the follow command line
 ```
 mvn test
+```
+
+* To run unit and integration test: Run the follow command line
+```
+mvn verify
 ```
 
 * To run application with spring-boot maven plugin:  Run the follow command line
@@ -57,3 +62,40 @@ java -jar ${target}/starwars-api-0.0.1-SNAPSHOT.jar
 
 ### Resources and Methods ###
 
+* Create a Planet
+```
+POST http://localhost:8080/starwars/api/planets
+
+BODY (example): 
+{
+    "name": "Alderaan", 
+    "climate": "temperate", 
+    "terrain": "grasslands, mountains"
+}
+```
+
+* Find All Planets in Database
+```
+
+ http://localhost:8080/starwars/api/planets
+```
+
+* Find All Planets at SwapiAPI
+``` 
+GET http://localhost:8080/starwars/api/planets?swapi=true&page={number}
+```
+
+* Find a Planet By ID
+```
+GET http://localhost:8080/starwars/api/planets/{id}
+```
+
+* Find a Planet By Name:
+``` 
+GET http://localhost:8080/starwars/api/planets?name={name}
+```
+
+* Delete a Planet By ID:
+```
+DELETE http://localhost:8080/starwars/api/planets/{id}
+```

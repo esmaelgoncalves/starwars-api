@@ -6,6 +6,7 @@ import br.com.esmaelgoncalves.starwarsapi.exception.PlanetNotFoundException;
 import br.com.esmaelgoncalves.starwarsapi.model.Planet;
 import br.com.esmaelgoncalves.starwarsapi.repository.PlanetRepository;
 import br.com.esmaelgoncalves.starwarsapi.repository.filter.PlanetFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class PlanetService {
 
@@ -23,13 +25,17 @@ public class PlanetService {
     private SwapiPlanetService swapiPlanetService;
 
     public Planet save(Planet planet) {
+        log.info("Executing a save method...");
+
         PlanetSwapiResponse.PlanetSwapi planetSwapi = swapiPlanetService.getPlanet(planet.getName());
 
         if (planetSwapi == null) {
             throw new InvalidPlanetException("The Planet name provided is invalid.");
         }
 
-        planet.setFilms(planetSwapi.getFilms().size());
+        if(planetSwapi.getFilms() != null && !planetSwapi.getFilms().isEmpty()) {
+            planet.setFilms(planetSwapi.getFilms().size());
+        }
 
         return repository.save(planet);
     }
@@ -59,10 +65,15 @@ public class PlanetService {
     }
 
     public ResponseEntity filter(PlanetFilter filter) {
+        log.info("Executing filter method...");
 
         if (filter.isSwapi()) {
+            log.info("Executing filter by swapi api...");
+
             return ResponseEntity.ok(swapiPlanetService.getPlanets(filter));
         } else if (filter.getName() != null) {
+            log.info("Executing a filter by name...");
+
             Optional<Planet> planet = repository.findByName(filter.getName());
 
             if (planet.isPresent()) {

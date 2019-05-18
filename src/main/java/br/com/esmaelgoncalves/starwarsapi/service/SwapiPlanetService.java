@@ -2,6 +2,7 @@ package br.com.esmaelgoncalves.starwarsapi.service;
 
 import br.com.esmaelgoncalves.starwarsapi.dto.PlanetSwapiResponse;
 import br.com.esmaelgoncalves.starwarsapi.repository.filter.PlanetFilter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -11,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class SwapiPlanetService {
 
@@ -24,6 +25,7 @@ public class SwapiPlanetService {
     private String planetUrl;
 
     public PlanetSwapiResponse getPlanets(PlanetFilter filter){
+        log.info("Executing a searching at swapi api...");
 
         Map<String, String> params = new HashMap();
         if(filter.getPage() > 0){
@@ -37,13 +39,16 @@ public class SwapiPlanetService {
         httpHeaders.add("User-Agent", "IdentificadorUSerAgent");
         HttpEntity request = new HttpEntity(null, httpHeaders);
 
-        PlanetSwapiResponse planetSwapiResponse = restTemplate.exchange(planetUrl + "?page={page}",
+        String url = planetUrl + "?page={page}";
+        log.info("Preparing to call: {}", url);
+        PlanetSwapiResponse planetSwapiResponse = restTemplate.exchange(url,
                 HttpMethod.GET, request, PlanetSwapiResponse.class, params).getBody();
 
         return planetSwapiResponse;
     }
 
     public PlanetSwapiResponse.PlanetSwapi getPlanet(String name){
+        log.info("Executing a searching at swapi api...");
 
         Map<String, String> params = new HashMap();
         params.put("search", name);
@@ -53,10 +58,16 @@ public class SwapiPlanetService {
         httpHeaders.add("content-type", "application/json");
         HttpEntity request = new HttpEntity(null, httpHeaders);
 
-        PlanetSwapiResponse planetSwapiResponse = restTemplate.exchange(planetUrl + "?search={search}",
+        String url = planetUrl + "?search={search}";
+        log.info("Preparing to call: {}", url);
+        PlanetSwapiResponse planetSwapiResponse = restTemplate.exchange(url,
                 HttpMethod.GET, request, PlanetSwapiResponse.class, params).getBody();
 
-        return planetSwapiResponse.getResults().get(0);
+        if(planetSwapiResponse.getResults() != null && !planetSwapiResponse.getResults().isEmpty()) {
+            return planetSwapiResponse.getResults().get(0);
+        } else {
+            return null;
+        }
     }
 
 }
